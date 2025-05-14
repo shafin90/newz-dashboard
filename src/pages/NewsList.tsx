@@ -1,62 +1,100 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   PencilIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
-
-// Mock data - replace with actual API data
-const mockNews = [
-  {
-    id: 1,
-    title: 'Breaking News: Major Development in Technology',
-    category: 'Technology',
-    views: 5000,
-    publishedDate: '2024-03-07',
-    status: 'Published',
-  },
-  {
-    id: 2,
-    title: 'Sports Update: Championship Results',
-    category: 'Sports',
-    views: 3500,
-    publishedDate: '2024-03-06',
-    status: 'Published',
-  },
-  {
-    id: 3,
-    title: 'Business News: Market Analysis',
-    category: 'Business',
-    views: 2800,
-    publishedDate: '2024-03-05',
-    status: 'Draft',
-  },
-  // Add more mock data as needed
-];
+import { newsService, NewsItem } from '../services/newsService';
+import toast from 'react-hot-toast';
+import EditNewsForm from '../components/EditNewsForm';
 
 export default function NewsList() {
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedLang, setSelectedLang] = useState('en');
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editItem, setEditItem] = useState<NewsItem | null>(null);
+  const [coverImage, setCoverImage] = useState<File | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const navigate = useNavigate();
 
-  const indexOfLastRow = currentPage * rowsPerPage;
-  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = mockNews.slice(indexOfFirstRow, indexOfLastRow);
-  const totalPages = Math.ceil(mockNews.length / rowsPerPage);
+  const languages = [
+    { code: 'en', name: 'English' },
+    { code: 'de', name: 'German' },
+    { code: 'es', name: 'Spanish' },
+    { code: 'fr', name: 'French' },
+    { code: 'it', name: 'Italian' },
+    { code: 'ru', name: 'Russian' },
+    { code: 'ar', name: 'Arabic' },
+    { code: 'tr', name: 'Turkish' },
+  ];
 
-  const handleEdit = (id: number) => {
-    // Implement edit functionality
-    console.log('Edit news with id:', id);
+  useEffect(() => {
+    fetchNews(currentPage);
+  }, [currentPage]);
+
+  const fetchNews = async (page = 1) => {
+    setIsLoading(true);
+    try {
+      const response = await newsService.getAllNews(page);
+      setNews(response.data);
+      setTotalPages(response.totalPages || 1);
+    } catch (error) {
+      toast.error('Failed to fetch news');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleDelete = (id: number) => {
-    // Implement delete functionality
-    console.log('Delete news with id:', id);
+  const handleDelete = async (id: string) => {
+    if (window.confirm('Are you sure you want to delete this news item?')) {
+      try {
+        await newsService.deleteNews(id);
+        toast.success('News deleted successfully');
+        fetchNews(currentPage);
+      } catch (error) {
+        toast.error('Failed to delete news');
+      }
+    }
   };
+
+  function openEditModal(item: NewsItem) {
+    setEditItem(item);
+    setIsEditOpen(true);
+  }
+
+  function closeEditModal() {
+    setIsEditOpen(false);
+    setEditItem(null);
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg text-gray-600">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-gray-900">News List</h1>
-        <button className="btn-primary">Add New Article</button>
+        <div className="flex gap-2">
+          <button
+            className="btn-secondary"
+            onClick={() => fetchNews(currentPage)}
+          >
+            Refresh
+          </button>
+          <button
+            className="btn-primary"
+            onClick={() => navigate('/dashboard/add-news')}
+          >
+            Add New Article
+          </button>
+        </div>
       </div>
 
       <div className="card">
@@ -68,7 +106,7 @@ export default function NewsList() {
                   Title
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
+                  Content
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Views
@@ -77,51 +115,42 @@ export default function NewsList() {
                   Published Date
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {currentRows.map((news) => (
-                <tr key={news.id}>
+              {news.map((item) => (
+                <tr key={item.id}>
                   <td className="px-6 py-5 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{news.title}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {item.title}
+                    </div>
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{news.category}</div>
+                    <div
+                      className="text-sm text-gray-500"
+                      dangerouslySetInnerHTML={{ __html: item.content.substring(0, 100) + '...' }}
+                    />
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{news.views.toLocaleString()}</div>
+                    <div className="text-sm text-gray-500">{item.views}</div>
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{news.publishedDate}</div>
-                  </td>
-                  <td className="px-6 py-5 whitespace-nowrap">
-                    <span
-                      className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        news.status === 'Published'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
-                    >
-                      {news.status}
-                    </span>
+                    <div className="text-sm text-gray-500">{new Date(item.createdAt).toLocaleDateString()}</div>
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap text-sm font-medium">
                     <button
-                      onClick={() => handleEdit(news.id)}
-                      className="text-primary-600 hover:text-primary-900 mr-4"
+                      onClick={() => openEditModal(item)}
+                      className="text-blue-600 hover:text-blue-900 mr-2"
                     >
-                      <PencilIcon className="h-5 w-5" />
+                      Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(news.id)}
+                      onClick={() => handleDelete(item.id)}
                       className="text-red-600 hover:text-red-900"
                     >
-                      <TrashIcon className="h-5 w-5" />
+                      Delete
                     </button>
                   </td>
                 </tr>
@@ -129,46 +158,38 @@ export default function NewsList() {
             </tbody>
           </table>
         </div>
-
-        {/* Pagination */}
-        <div className="flex items-center justify-between px-6 py-5 border-t border-gray-200">
-          <div className="flex items-center">
-            <label htmlFor="rows-per-page" className="text-sm text-gray-700 mr-3">
-              Rows per page:
-            </label>
-            <select
-              id="rows-per-page"
-              value={rowsPerPage}
-              onChange={(e) => setRowsPerPage(Number(e.target.value))}
-              className="input-field w-20"
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-            </select>
-          </div>
-          <div className="flex items-center space-x-3">
+        {/* Pagination Controls */}
+        <div className="flex justify-center items-center gap-2 py-4">
+          {Array.from({ length: totalPages }, (_, i) => (
             <button
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="btn-secondary disabled:opacity-50"
+              key={i + 1}
+              className={`px-3 py-1 rounded ${currentPage === i + 1 ? 'bg-primary-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+              onClick={() => setCurrentPage(i + 1)}
+              disabled={currentPage === i + 1}
             >
-              Previous
+              {i + 1}
             </button>
-            <span className="text-sm text-gray-700">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="btn-secondary disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
+          ))}
         </div>
       </div>
+
+      {isEditOpen && editItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-lg z-60 relative">
+            <h2 className="text-xl font-bold mb-4">Edit News</h2>
+            <EditNewsForm
+              item={editItem}
+              onClose={closeEditModal}
+              onSuccess={() => {
+                closeEditModal();
+                fetchNews();
+              }}
+              coverImage={coverImage}
+              setCoverImage={setCoverImage}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
