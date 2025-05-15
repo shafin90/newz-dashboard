@@ -5,9 +5,6 @@ export const BASE_URL = 'http://localhost:9000'; // Add base URL for image paths
 
 const api = axios.create({
   baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Add request interceptor for authentication

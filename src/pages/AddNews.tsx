@@ -38,16 +38,9 @@ export default function AddNews() {
     try {
       const formData = new FormData();
       
-      // Initialize empty strings for all languages
-      const titleObj = languages.reduce((acc, lang) => {
-        acc[lang.code] = lang.code === selectedLang ? title : '';
-        return acc;
-      }, {} as Record<string, string>);
-
-      const contentObj = languages.reduce((acc, lang) => {
-        acc[lang.code] = lang.code === selectedLang ? content : '';
-        return acc;
-      }, {} as Record<string, string>);
+      // Create title and content objects for the selected language
+      const titleObj = { [selectedLang]: title };
+      const contentObj = { [selectedLang]: content };
 
       formData.append('title', JSON.stringify(titleObj));
       formData.append('content', JSON.stringify(contentObj));

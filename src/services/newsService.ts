@@ -50,7 +50,11 @@ export const newsService = {
 
   // Create a new news item
   createNews: async (data: FormData): Promise<NewsItem> => {
-    const response = await api.post('/news', data);
+    const response = await api.post('/news', data, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
     return response.data;
   },
 
