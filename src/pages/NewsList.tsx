@@ -202,17 +202,21 @@ export default function NewsList() {
       </div>
 
       {isEditOpen && editItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-          <div className="bg-white p-6 rounded shadow-lg w-full max-w-lg z-60 relative">
-            <h2 className="text-xl font-bold mb-4">Edit News</h2>
-            <EditNewsForm
-              item={editItem}
-              onClose={closeEditModal}
-              onSuccess={() => {
-                closeEditModal();
-                fetchNews();
-              }}
-            />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30 p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900">Edit News</h2>
+            </div>
+            <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 10rem)' }}>
+              <EditNewsForm
+                item={editItem}
+                onClose={closeEditModal}
+                onSuccess={() => {
+                  closeEditModal();
+                  fetchNews();
+                }}
+              />
+            </div>
           </div>
         </div>
       )}

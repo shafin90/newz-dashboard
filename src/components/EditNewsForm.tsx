@@ -74,81 +74,83 @@ export default function EditNewsForm({ item, onClose, onSuccess }: EditNewsFormP
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="language" className="block text-sm font-medium text-gray-700">
-          Select Language
-        </label>
-        <select
-          id="language"
-          value={selectedLang}
-          onChange={(e) => handleLanguageChange(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-        >
-          {languages.map((lang) => (
-            <option key={lang.code} value={lang.code}>
-              {lang.name}
-            </option>
-          ))}
-        </select>
-      </div>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-6">
+        <div>
+          <label htmlFor="language" className="block text-sm font-medium text-gray-700">
+            Select Language
+          </label>
+          <select
+            id="language"
+            value={selectedLang}
+            onChange={(e) => handleLanguageChange(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          >
+            {languages.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Title
-        </label>
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          required
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Content
-        </label>
-        <div className="mt-1 mb-8">
-          <ReactQuill
-            theme="snow"
-            value={content}
-            onChange={setContent}
-            className="h-64"
-            modules={{
-              toolbar: [
-                [{ 'header': [1, 2, false] }],
-                ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-                [{'list': 'ordered'}, {'list': 'bullet'}],
-                ['link', 'image'],
-                ['clean']
-              ],
-            }}
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Title
+          </label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            required
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Content
+          </label>
+          <div className="mt-1">
+            <ReactQuill
+              theme="snow"
+              value={content}
+              onChange={setContent}
+              className="h-64"
+              modules={{
+                toolbar: [
+                  [{ 'header': [1, 2, false] }],
+                  ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                  [{'list': 'ordered'}, {'list': 'bullet'}],
+                  ['link', 'image'],
+                  ['clean']
+                ],
+              }}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Cover Image
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setCoverImage(e.target.files ? e.target.files[0] : null)}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          />
+          {item.coverImage && !coverImage && (
+            <img
+              src={`${BASE_URL}${item.coverImage}`}
+              alt="Current cover"
+              className="mt-2 h-32 w-auto object-cover rounded"
+            />
+          )}
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700">
-          Cover Image
-        </label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setCoverImage(e.target.files ? e.target.files[0] : null)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-        />
-        {item.coverImage && !coverImage && (
-          <img
-            src={`${BASE_URL}${item.coverImage}`}
-            alt="Current cover"
-            className="mt-2 h-32 w-auto object-cover rounded"
-          />
-        )}
-      </div>
-
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-2 pt-6">
         <button
           type="button"
           onClick={onClose}
