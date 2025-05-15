@@ -111,7 +111,7 @@ export default function AddNews() {
                 theme="snow"
                 value={content}
                 onChange={setContent}
-                className="h-64"
+                className="h-64 mb-20"
                 modules={{
                   toolbar: [
                     [{ 'header': [1, 2, false] }],
