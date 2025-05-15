@@ -106,21 +106,37 @@ export default function AddNews() {
             <label htmlFor="content" className="block text-sm font-medium text-gray-700">
               Content
             </label>
-            <div className="mt-1 mb-8">
+            <div className="mt-1">
               <ReactQuill
                 theme="snow"
                 value={content}
                 onChange={setContent}
-                className="h-64 mb-20"
+                className="h-64"
                 modules={{
                   toolbar: [
-                    [{ 'header': [1, 2, false] }],
-                    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-                    [{'list': 'ordered'}, {'list': 'bullet'}],
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    [{ 'size': ['small', 'normal', 'large', 'huge'] }],
+                    [{ 'font': [] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'align': [] }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['blockquote', 'code-block'],
                     ['link', 'image'],
                     ['clean']
                   ],
                 }}
+                formats={[
+                  'header',
+                  'size',
+                  'font',
+                  'bold', 'italic', 'underline', 'strike',
+                  'color', 'background',
+                  'align',
+                  'list', 'bullet',
+                  'blockquote', 'code-block',
+                  'link', 'image'
+                ]}
               />
             </div>
           </div>
