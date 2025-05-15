@@ -23,8 +23,8 @@ export interface CreateNewsData {
 }
 
 export interface UpdateNewsData {
-  title?: string;
-  content?: string;
+  title?: { [key: string]: string };
+  content?: { [key: string]: string };
   originalLang?: string;
 }
 

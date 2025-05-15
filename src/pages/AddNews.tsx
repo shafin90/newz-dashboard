@@ -58,6 +58,9 @@ export default function AddNews() {
           <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
             Add New News
           </h2>
+          <p className="mt-2 text-sm text-gray-500">
+            Enter the news in the original language. Translations for all other supported languages will be generated automatically.
+          </p>
         </div>
       </div>
 
@@ -93,6 +96,9 @@ export default function AddNews() {
                 </option>
               ))}
             </select>
+            <p className="mt-1 text-xs text-gray-400">
+              The news will be automatically translated into: German, English, Spanish, French, Italian, Russian, Arabic, and Turkish.
+            </p>
           </div>
 
           <div>
