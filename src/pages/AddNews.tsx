@@ -111,7 +111,7 @@ export default function AddNews() {
                 theme="snow"
                 value={content}
                 onChange={setContent}
-                className="h-64"
+                className="h-64 mb-12"
                 modules={{
                   toolbar: [
                     [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
@@ -141,7 +141,7 @@ export default function AddNews() {
             </div>
           </div>
 
-          <div>
+          <div className="mt-8">
             <label htmlFor="coverImage" className="block text-sm font-medium text-gray-700">
               Cover Image
             </label>
