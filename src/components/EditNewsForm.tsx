@@ -2,6 +2,7 @@ import { useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { newsService, NewsItem } from '../services/newsService';
+import { BASE_URL } from '../config/api';
 import toast from 'react-hot-toast';
 
 const languages = [
@@ -61,7 +62,7 @@ export default function EditNewsForm({ item, onClose, onSuccess }: EditNewsFormP
         formData.append('coverImage', coverImage);
       }
 
-      await newsService.updateNews(item.id, formData);
+      await newsService.updateNews(item._id, formData);
       toast.success('News updated successfully');
       onSuccess();
     } catch (error) {
@@ -140,7 +141,7 @@ export default function EditNewsForm({ item, onClose, onSuccess }: EditNewsFormP
         />
         {item.coverImage && !coverImage && (
           <img
-            src={item.coverImage}
+            src={`${BASE_URL}${item.coverImage}`}
             alt="Current cover"
             className="mt-2 h-32 w-auto object-cover rounded"
           />

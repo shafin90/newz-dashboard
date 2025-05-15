@@ -1,7 +1,8 @@
 import api from '../config/api';
 
 export interface NewsItem {
-  id: string;
+  _id: string;
+  id?: string;
   title: { [key: string]: string };
   content: { [key: string]: string };
   originalLang: string;

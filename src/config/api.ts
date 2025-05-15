@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const API_URL = 'http://localhost:9000/api'; // Update this with your backend URL
+export const BASE_URL = 'http://localhost:9000'; // Add base URL for image paths
 
 const api = axios.create({
   baseURL: API_URL,

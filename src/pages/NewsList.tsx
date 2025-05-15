@@ -134,7 +134,7 @@ export default function NewsList() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {news.map((item) => (
-                <tr key={item.id}>
+                <tr key={item._id}>
                   <td className="px-6 py-5 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
                       {item.title?.[selectedLang] || ''}
@@ -171,7 +171,7 @@ export default function NewsList() {
                       Edit
                     </button>
                     <button
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => handleDelete(item._id)}
                       className="text-red-600 hover:text-red-900"
                     >
                       Delete
