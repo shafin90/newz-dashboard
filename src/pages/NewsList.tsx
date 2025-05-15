@@ -125,22 +125,22 @@ export default function NewsList() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Title
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Content
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Original Language
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Views
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Published Date
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -148,14 +148,14 @@ export default function NewsList() {
             <tbody className="bg-white divide-y divide-gray-200">
               {news.map((item) => (
                 <tr key={item._id}>
-                  <td className="px-6 py-5 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900 leading-relaxed">
                       {item.title?.[selectedLang] || ''}
                     </div>
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap">
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <div
-                      className="text-sm text-gray-500"
+                      className="text-sm text-gray-500 leading-relaxed"
                       dangerouslySetInnerHTML={{ 
                         __html: item.content?.[selectedLang] ? 
                           item.content[selectedLang].substring(0, 100) + '...' : 
@@ -163,29 +163,29 @@ export default function NewsList() {
                       }}
                     />
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 leading-relaxed">
                       {languages.find(lang => lang.code === item.originalLang)?.name || ''}
                     </div>
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{item.views}</div>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 leading-relaxed">{item.views}</div>
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <div className="text-sm text-gray-500 leading-relaxed">
                       {new Date(item.createdAt).toLocaleDateString()}
                     </div>
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap text-sm font-medium">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium space-x-2">
                     <button
                       onClick={() => openPreviewModal(item)}
-                      className="text-blue-600 hover:text-blue-900 mr-2"
+                      className="text-blue-600 hover:text-blue-900"
                     >
                       Preview
                     </button>
                     <button
                       onClick={() => openEditModal(item)}
-                      className="text-blue-600 hover:text-blue-900 mr-2"
+                      className="text-blue-600 hover:text-blue-900"
                     >
                       Edit
                     </button>
