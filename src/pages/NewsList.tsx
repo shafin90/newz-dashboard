@@ -7,6 +7,7 @@ import {
 import { newsService, NewsItem } from '../services/newsService';
 import toast from 'react-hot-toast';
 import EditNewsForm from '../components/EditNewsForm';
+import PreviewModal from '../components/PreviewModal';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -27,6 +28,8 @@ export default function NewsList() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [selectedLang, setSelectedLang] = useState('en');
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewItem, setPreviewItem] = useState<NewsItem | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -66,6 +69,16 @@ export default function NewsList() {
   function closeEditModal() {
     setIsEditOpen(false);
     setEditItem(null);
+  }
+
+  function openPreviewModal(item: NewsItem) {
+    setPreviewItem(item);
+    setShowPreview(true);
+  }
+
+  function closePreviewModal() {
+    setShowPreview(false);
+    setPreviewItem(null);
   }
 
   if (isLoading) {
@@ -165,6 +178,12 @@ export default function NewsList() {
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap text-sm font-medium">
                     <button
+                      onClick={() => openPreviewModal(item)}
+                      className="text-blue-600 hover:text-blue-900 mr-2"
+                    >
+                      Preview
+                    </button>
+                    <button
                       onClick={() => openEditModal(item)}
                       className="text-blue-600 hover:text-blue-900 mr-2"
                     >
@@ -219,6 +238,15 @@ export default function NewsList() {
             </div>
           </div>
         </div>
+      )}
+
+      {showPreview && previewItem && (
+        <PreviewModal
+          title={previewItem.title[selectedLang] || ''}
+          content={previewItem.content[selectedLang] || ''}
+          coverImage={previewItem.coverImage}
+          onClose={closePreviewModal}
+        />
       )}
     </div>
   );

@@ -4,6 +4,7 @@ import 'react-quill/dist/quill.snow.css';
 import { newsService, NewsItem } from '../services/newsService';
 import { BASE_URL } from '../config/api';
 import toast from 'react-hot-toast';
+import PreviewModal from './PreviewModal';
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -28,11 +29,21 @@ export default function EditNewsForm({ item, onClose, onSuccess }: EditNewsFormP
   const [content, setContent] = useState(item.content?.[selectedLang] || '');
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | undefined>(item.coverImage);
 
   const handleLanguageChange = (lang: string) => {
     setSelectedLang(lang);
     setTitle(item.title?.[lang] || '');
     setContent(item.content?.[lang] || '');
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setCoverImage(file);
+      setPreviewImage(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,35 +148,61 @@ export default function EditNewsForm({ item, onClose, onSuccess }: EditNewsFormP
           <input
             type="file"
             accept="image/*"
-            onChange={(e) => setCoverImage(e.target.files ? e.target.files[0] : null)}
+            onChange={handleImageChange}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
-          {item.coverImage && !coverImage && (
+          {previewImage && !coverImage && (
             <img
-              src={`${BASE_URL}${item.coverImage}`}
+              src={`${BASE_URL}${previewImage}`}
               alt="Current cover"
+              className="mt-2 h-32 w-auto object-cover rounded"
+            />
+          )}
+          {coverImage && previewImage && (
+            <img
+              src={previewImage}
+              alt="New cover"
               className="mt-2 h-32 w-auto object-cover rounded"
             />
           )}
         </div>
       </div>
 
-      <div className="flex justify-end gap-2 pt-6">
+      <div className="flex justify-between items-center gap-2 pt-6">
         <button
           type="button"
-          onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+          onClick={() => setShowPreview(true)}
+          className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-transparent rounded-md hover:bg-blue-100"
         >
-          Cancel
+          Preview
         </button>
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:bg-blue-400"
-        >
-          {isSubmitting ? 'Saving...' : 'Save Changes'}
-        </button>
+        
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:bg-blue-400"
+          >
+            {isSubmitting ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
       </div>
+
+      {showPreview && (
+        <PreviewModal
+          title={title}
+          content={content}
+          coverImage={previewImage}
+          onClose={() => setShowPreview(false)}
+        />
+      )}
     </form>
   );
 } 
