@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   PencilIcon,
   TrashIcon,
@@ -8,27 +8,26 @@ import { newsService, NewsItem } from '../services/newsService';
 import toast from 'react-hot-toast';
 import EditNewsForm from '../components/EditNewsForm';
 
+const languages = [
+  { code: 'en', name: 'English' },
+  { code: 'de', name: 'German' },
+  { code: 'es', name: 'Spanish' },
+  { code: 'fr', name: 'French' },
+  { code: 'it', name: 'Italian' },
+  { code: 'ru', name: 'Russian' },
+  { code: 'ar', name: 'Arabic' },
+  { code: 'tr', name: 'Turkish' },
+];
+
 export default function NewsList() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedLang, setSelectedLang] = useState('en');
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editItem, setEditItem] = useState<NewsItem | null>(null);
-  const [coverImage, setCoverImage] = useState<File | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [selectedLang, setSelectedLang] = useState('en');
   const navigate = useNavigate();
-
-  const languages = [
-    { code: 'en', name: 'English' },
-    { code: 'de', name: 'German' },
-    { code: 'es', name: 'Spanish' },
-    { code: 'fr', name: 'French' },
-    { code: 'it', name: 'Italian' },
-    { code: 'ru', name: 'Russian' },
-    { code: 'ar', name: 'Arabic' },
-    { code: 'tr', name: 'Turkish' },
-  ];
 
   useEffect(() => {
     fetchNews(currentPage);
@@ -82,6 +81,17 @@ export default function NewsList() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-gray-900">News List</h1>
         <div className="flex gap-2">
+          <select
+            value={selectedLang}
+            onChange={(e) => setSelectedLang(e.target.value)}
+            className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          >
+            {languages.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.name}
+              </option>
+            ))}
+          </select>
           <button
             className="btn-secondary"
             onClick={() => fetchNews(currentPage)}
@@ -109,6 +119,9 @@ export default function NewsList() {
                   Content
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Original Language
+                </th>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Views
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -124,20 +137,31 @@ export default function NewsList() {
                 <tr key={item.id}>
                   <td className="px-6 py-5 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
-                      {item.title}
+                      {item.title?.[selectedLang] || ''}
                     </div>
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap">
                     <div
                       className="text-sm text-gray-500"
-                      dangerouslySetInnerHTML={{ __html: item.content.substring(0, 100) + '...' }}
+                      dangerouslySetInnerHTML={{ 
+                        __html: item.content?.[selectedLang] ? 
+                          item.content[selectedLang].substring(0, 100) + '...' : 
+                          '' 
+                      }}
                     />
+                  </td>
+                  <td className="px-6 py-5 whitespace-nowrap">
+                    <div className="text-sm text-gray-500">
+                      {languages.find(lang => lang.code === item.originalLang)?.name || ''}
+                    </div>
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap">
                     <div className="text-sm text-gray-500">{item.views}</div>
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{new Date(item.createdAt).toLocaleDateString()}</div>
+                    <div className="text-sm text-gray-500">
+                      {new Date(item.createdAt).toLocaleDateString()}
+                    </div>
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap text-sm font-medium">
                     <button
@@ -184,8 +208,6 @@ export default function NewsList() {
                 closeEditModal();
                 fetchNews();
               }}
-              coverImage={coverImage}
-              setCoverImage={setCoverImage}
             />
           </div>
         </div>

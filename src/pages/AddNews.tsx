@@ -19,7 +19,7 @@ const languages = [
 export default function AddNews() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [originalLang, setOriginalLang] = useState('en');
+  const [selectedLang, setSelectedLang] = useState('en');
   const [coverImage, setCoverImage] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -37,14 +37,28 @@ export default function AddNews() {
     setIsSubmitting(true);
     try {
       const formData = new FormData();
-      formData.append('title', JSON.stringify({ [originalLang]: title }));
-      formData.append('content', JSON.stringify({ [originalLang]: content }));
-      formData.append('originalLang', originalLang);
+      
+      // Initialize empty strings for all languages
+      const titleObj = languages.reduce((acc, lang) => {
+        acc[lang.code] = lang.code === selectedLang ? title : '';
+        return acc;
+      }, {} as Record<string, string>);
+
+      const contentObj = languages.reduce((acc, lang) => {
+        acc[lang.code] = lang.code === selectedLang ? content : '';
+        return acc;
+      }, {} as Record<string, string>);
+
+      formData.append('title', JSON.stringify(titleObj));
+      formData.append('content', JSON.stringify(contentObj));
+      formData.append('originalLang', selectedLang);
       formData.append('coverImage', coverImage);
+      
       await newsService.createNews(formData);
       toast.success('News created successfully');
       navigate('/dashboard/news-list');
     } catch (error) {
+      console.error('Create news error:', error);
       toast.error('Failed to create news');
     } finally {
       setIsSubmitting(false);
@@ -58,14 +72,29 @@ export default function AddNews() {
           <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
             Add New News
           </h2>
-          <p className="mt-2 text-sm text-gray-500">
-            Enter the news in the original language. Translations for all other supported languages will be generated automatically.
-          </p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-6" encType="multipart/form-data">
         <div className="space-y-4">
+          <div>
+            <label htmlFor="language" className="block text-sm font-medium text-gray-700">
+              Select Language
+            </label>
+            <select
+              id="language"
+              value={selectedLang}
+              onChange={(e) => setSelectedLang(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            >
+              {languages.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700">
               Title
@@ -81,36 +110,24 @@ export default function AddNews() {
           </div>
 
           <div>
-            <label htmlFor="language" className="block text-sm font-medium text-gray-700">
-              Original Language
-            </label>
-            <select
-              id="language"
-              value={originalLang}
-              onChange={(e) => setOriginalLang(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            >
-              {languages.map((lang) => (
-                <option key={lang.code} value={lang.code}>
-                  {lang.name}
-                </option>
-              ))}
-            </select>
-            <p className="mt-1 text-xs text-gray-400">
-              The news will be automatically translated into: German, English, Spanish, French, Italian, Russian, Arabic, and Turkish.
-            </p>
-          </div>
-
-          <div>
             <label htmlFor="content" className="block text-sm font-medium text-gray-700">
               Content
             </label>
-            <div className="mt-1">
+            <div className="mt-1 mb-8">
               <ReactQuill
                 theme="snow"
                 value={content}
                 onChange={setContent}
-                className="h-64 mb-12"
+                className="h-64"
+                modules={{
+                  toolbar: [
+                    [{ 'header': [1, 2, false] }],
+                    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                    [{'list': 'ordered'}, {'list': 'bullet'}],
+                    ['link', 'image'],
+                    ['clean']
+                  ],
+                }}
               />
             </div>
           </div>
