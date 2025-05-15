@@ -2,9 +2,10 @@ import api from '../config/api';
 
 export interface NewsItem {
   id: string;
-  title: string;
-  content: string;
+  title: { [key: string]: string };
+  content: { [key: string]: string };
   originalLang: string;
+  coverImage?: string;
   translations: {
     [key: string]: {
       title: string;
@@ -53,8 +54,14 @@ export const newsService = {
   },
 
   // Update a news item
-  updateNews: async (id: string, data: UpdateNewsData): Promise<NewsItem> => {
-    const response = await api.put(`/news/${id}`, data);
+  updateNews: async (id: string, data: FormData | UpdateNewsData): Promise<NewsItem> => {
+    const response = await api.put(`/news/${id}`, data, {
+      headers: data instanceof FormData ? {
+        'Content-Type': 'multipart/form-data'
+      } : {
+        'Content-Type': 'application/json'
+      }
+    });
     return response.data;
   },
 
